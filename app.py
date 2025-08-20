@@ -1,31 +1,29 @@
 from fastapi import FastAPI, UploadFile, File
 import pandas as pd
 import joblib
+from predictor import Predictor
 
-#загружаю модель
+app = FastAPI(title="Heart Disease Predictor")
+
+# Загружаем модель при старте
 model = joblib.load("model.pkl")
-
-app = FastAPI(title="Heart Risk Predictor")
-
-@app.get("/")
-def root():
-    return {"message": "API работает"}
+predictor = Predictor(model)
 
 @app.post("/predict")
-def predict(file: UploadFile = File(...)):
-    #читаю CSV из запроса
+async def predict(file: UploadFile = File(...)):
+    # читаем csv
     df = pd.read_csv(file.file)
     
-    ids = df["id"]
-    X = df.drop("id", axis=1)
-
-    #предсказываю
-    preds = model.predict(X)
-
+    # делаем предсказание
+    predictions = predictor.predict(df)
     
+    # формируем ответ
     result = pd.DataFrame({
-        "id": ids,
-        "prediction": preds
+        "id": df["id"],
+        "prediction": predictions
     })
 
+    # сохраняем файл
+    result.to_csv("predicted.csv", index=False)
+    
     return result.to_dict(orient="records")
