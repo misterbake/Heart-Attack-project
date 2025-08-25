@@ -32,7 +32,7 @@ Swagger UI (документация): http://127.0.0.1:8000/docs
 5) Сравнение предсказаний с эталоном
 После того как API сформирует файл predicted.csv, сравни его с эталонными ответами:
 
-python test.py --student predicted.csv --correct correct_answers.csv
+    python test.py --student predicted.csv --correct correct_answers.csv
 ----------------------
 ## Использование API
 
